@@ -1,0 +1,26 @@
+{
+  "name": "webd6201",
+  "description": "Repository for all In-Class Exercises.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  },
+  "scripts": {
+    "start": "lite-server"
+  },
+  "repository": "git+https://github.com/JustDru/webd6201.git",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JustDru/webd6201/issues"
+  },
+  "homepage": "https://github.com/JustDru/webd6201#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.2.1",
+    "@popperjs/core": "^2.11.6",
+    "bootstrap": "^5.2.3",
+    "jquery": "^3.6.3"
+  }
+}
