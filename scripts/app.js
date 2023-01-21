@@ -19,6 +19,16 @@
 
     MainContent.appendChild(MainParagraph)
 
+    let FirstString = "This is";
+    let SecondString = `${FirstString} the Main Paragraph`;
+    MainParagraph.textContent = SecondString;
+
+    let Article = document.createElement("article");
+    let ArticleParagraph = `<p id="ArticleParagraph" class='"mt-3">This is my article paragraph</p>`;
+    Article.setAttribute("class", "container")
+    Article.innerHTML = ArticleParagraph;
+    DocumentBody.appendChild(article);
+
     function DisplayProductsPage(){
         let ProductsButton = document.getElementById("ProductsBtn");
         ProductsButton.addEventListener("click", function()
