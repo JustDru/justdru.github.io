@@ -5,23 +5,65 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, intial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Demo Project - WEBD 6201 - Week 1 Lesson 1</title>
+    <title>Home</title>
 
     <!-- CSS Section -->
     <link rel="stylesheet" href="./content/app.css">
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/boostrap.min.css">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.css">
-
 </head>
+<header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.html"><i class="fa-solid fa-shrimp"></i> WEBD6201</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="products.html">Product</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="services.html">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.html">Contact Us</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</header>
+
 <body>
-    <h1>Welcome to Week 1</h1>
+<main class="container">
+    <h1 class="mb-5">Welcome to Our Site!</h1>
+    <button id="AboutUsBtn" class="btn btn-primary">About Us</button>
+</main>
+
+<!-- <main class="container">
+    <h1 class="mb-5">Click here to contact us.</h1>
+    <button id="ContactUsBtn" class="btn btn-primary">Contact Us</button>
+</main>
+<main class="container">
+    <h1 class="mb-5">Click here to view our products.</h1>
+    <button id="ProductsBtn" class="btn btn-primary">Products</button>
+</main>
+<main class="container">
+    <h1 class="mb-5">Click here to view our services.</h1>
+    <button id="ServicesBtn" class="btn btn-primary">Services</button>
+</main> -->
 
     <!-- Scripting Section -->
     <script src="./scripts/app.js"></script>
     <script src="./node_modules/jquery/dist/jquery.min.js"></script>
     <script src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <div class="container">
-        <i class="fa-solid fa-cloud-moon"></i>
-    </div>
 </body>
 </html>
