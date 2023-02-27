@@ -1,6 +1,6 @@
 {
-  "name": "Week 2 - Part 2",
-  "description": "Week 2 - Part 2",
+  "name": "assignment2",
+  "description": "Assignment 2 - jQuery & Form Validation",
   "version": "1.0.0",
   "main": "index.js",
   "devDependencies": {
