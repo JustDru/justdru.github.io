@@ -1,369 +1,372 @@
-/*
-Name: Andrew Graham & Sebastian Castelan
-Student IDs: 100825866 & 100824947
-Date: February 26th, 2023
- */
-
 "use strict";
-class User{
 
-    constructor(firstName = "", lastName = "", userPass = "" , userEmailAddress = ""){
-        this.FirstName = firstName;
-        this.LastName = lastName;
-        this.UserPass = userPass;
-        this.UserEmailAddress = userEmailAddress;
-    }
+(function(){
 
-    // Getters and Setters
-    get FirstName(){
-        return this.FirstName;
-    }
-    get LastName(){
-        return this.LastName;
-    }
-
-    get UserPass(){
-        return this.UserPass;
-    }
-    get UserEmailAddress(){
-        return this.UserEmailAddress;
-    }
-
-    set LastName(lastName){
-        this.m_lastName = lastName;
-    }
-    set FirstName(firstName){
-        this.m_firstName = firstName;
-    }
-
-    set UserPass(userPass){
-        this.m_contactNumber = userPass;
-    }
-
-    set UserEmailAddress(userEmailAddress){
-        this.m_emailAddress = userEmailAddress;
-    }
-
-    toString(){
-        return `First Name: ${this.FirstName}\Last Name: ${this.LastName}\n User Pass: ${this.UserPass}\n User Email Address: ${this.UserEmailAddress}`;
-    }
-}
-
-// IIFE
-
-(function () {
-    let UnorderedList = document.getElementsByTagName("ul")[0];
-    // Utilizes DOM Manipulation to create Human Resources and put it into NavBar.
-    // TODO: Figure out how to put Human Resources in between About and Contact
-
-    let HumanResources = document.createElement("li");
-    HumanResources.innerHTML = `<a class="nav-link" href="humanresources.html"><i class="fa-solid fa-cube"></i> Human Resources</a>`;
-    HumanResources.setAttribute("class", "nav-item");
-    UnorderedList.appendChild(HumanResources);
-
-    function Start() {
-        console.log("App Started!")
-        CheckLogin();
-        switch (document.title) {
-            case "Home":
-                DisplayHomePage();
-                break;
-            case "Our Projects":
-                DisplayProjectsPage();
-                break;
-            case "About Us":
-                DisplayAboutUsPage();
-                break;
-            case "Our Services":
-                DisplayServicesPage();
-                break;
-            case "Contact Us":
-                DisplayContactPage();
-                break;
-            case "Login":
-                DisplayLoginPage();
-                break;
-            case "Register":
-                DisplayRegisterPage();
-                break;
+    /**
+     * Instantiates a contact and stores in localStorage
+     * @param fullName
+     * @param contactNumber
+     * @param emailAddress
+     * @constructor
+     */
+    function AddContact(fullName, contactNumber, emailAddress){
+        let contact = new core.Contact(fullName, contactNumber, emailAddress);
+        if(contact.serialize()) {
+            let key = contact.FullName.substring(0, 1) + Date.now();
+            localStorage.setItem(key, contact.serialize());
         }
     }
-    // Displays Login Page
+
+    function AjaxRequest(method, url, callback){
+
+        let xhr = new XMLHttpRequest();
+
+        xhr.addEventListener("readystatechange", () => {
+
+            if(xhr.readyState === 4 && xhr.status === 200){
+
+                if(typeof callback === "function") {
+                    callback(xhr.responseText);
+
+                }
+                else{
+                    console.error("Error: callback is not a valid function");
+                }
+            }
+        });
+
+        xhr.open(method, url);
+        xhr.send();
+    }
+
+
+
+
+    function DisplayHomePage(){
+        console.log("Home Page Called");
+
+        let xhr = new XMLHttpRequest();
+
+        $("#AboutUsBtn").on("click", () => {
+            location.href = "/about";
+        });
+
+        $("main").append(`<p id="MainParagraph" class="mt-3" >This is the main paragraph</p>`);
+
+        $("body").append(`<article class="container">
+                    <p id="ArticleParagraph" class="mt-3"> This is my article paragraph</p></article>`)
+
+
+    }
+
+
+    function DisplayProductPage(){
+        console.log("Products Page Called");
+    }
+    function DisplayServicesPage(){
+        console.log("Services Page Called");
+    }
+    function DisplayAboutUsPage(){
+        console.log("About Us Page Called");
+    }
+
+
+    /**
+     * This function will validate an input provided based on a given regular expression
+     * @param {string} input_field_id
+     * @param {RegExp} regular_expression
+     * @param {string} error_message
+     */
+    function validateField(input_field_id, regular_expression, error_message){
+        let fullNamePattern = regular_expression;
+        let messageArea = $("#messageArea");
+
+        $(input_field_id).on("blur", function(){
+
+            let fullNameText = $(this).val();
+            if(!fullNamePattern.test(fullNameText)) {
+                // Fail validation
+                $(this).trigger("focus").trigger("select");
+                messageArea.addClass("alert alert-danger").text(error_message).show();
+            }
+            else{
+                // Pass validation
+                messageArea.removeAttr("class").hide();
+
+            }
+
+        });
+    }
+
+    function ContactFormValidation(){
+        validateField("#fullName",
+            /^([A-Z][a-z]{1,3}\.?\s)?([A-Z][a-z]+)+([\s,-]([A-z][a-z]+))*$/,
+            "Please enter a valid first and last name"); // fullName
+        validateField("#contactNumber",
+            /^(\+\d{1,3}[\s-.])?\(?\d{3}\)?[\s-.]?\d{3}[\s-.]\d{4}$/,
+            "Please enter a valid contact number"); // contactNumber
+        validateField("#emailAddress",
+            /^[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,10}$/,
+            "Please enter a valid email address"); // emailAddress
+    }
+
+    function DisplayContactPage(){
+        console.log("Contact Us Page Called");
+
+        ContactFormValidation();
+
+        let sendButton = document.getElementById("sendButton");
+        let subscribeCheckbox = document.getElementById("subscribeCheckbox");
+
+        sendButton.addEventListener("click", function(event){
+            if(subscribeCheckbox.checked){
+                let contact = new core.Contact(fullName.value, contactNumber.value, emailAddress.value);
+                if(contact.serialize()){
+                    let key = contact.FullName.substring(0,1) + Date.now();
+                    localStorage.setItem(key, contact.serialize());
+                }
+            }
+        });
+
+    }
+    function DisplayContactListPage(){
+        console.log("Contact List Page Called");
+
+        if(localStorage.length > 0){
+            let contactList = document.getElementById("contactList");
+            let data = ""; // add deserialized data from localStorage
+
+            let keys = Object.keys(localStorage); // Return a string array of keys
+
+            let index = 1;
+            for(const key of keys){
+                let contactData = localStorage.getItem(key);
+                let contact = new core.Contact();
+                contact.deserialize(contactData);
+                data += `<tr><th scope="row" class="text-center">${index}</th>
+                         <td>${contact.FullName}</td>
+                         <td>${contact.ContactNumber}</td>
+                         <td>${contact.EmailAddress}</td>
+                         
+                         <td class="text-center">
+                            <button value="${key}" class="btn btn-primary btn-sm edit">
+                                <i class="fas fa-edit fa-sm"></i> Edit
+                            </button>
+                         </td>
+                         
+                         <td class="text-center">
+                            <button value="${key}" class="btn btn-danger btn-sm delete">
+                                <i class="fas fa-trash-alt fa-sm"></i> Delete
+                            </button>
+                         </td>
+                         
+                         </tr>`;
+                index++;
+            }
+            contactList.innerHTML = data;
+
+            $("#addButton").on("click", () => {
+                location.href = "/edit#add";
+            });
+
+
+            $("button.delete").on("click", function (){
+                //confirm delete
+                if(confirm("Delete contact, are you sure?")){
+                    localStorage.removeItem($(this).val())
+                }
+                location.href = "/contact-list";
+            });
+
+            $("button.edit").on("click", function (){
+                location.href = "/edit#" + $(this).val();
+            });
+
+        }
+
+    }
+
+    function DisplayEditPage(){
+        console.log("Edit Page");
+
+        let page = location.hash.substring(1);
+        ContactFormValidation();
+        switch(page){
+            case "add":
+                $("main>h1").text("Add Contact");
+                $("#editButton").html(`<i class="fas fa-plus-circle fa-sm"></i> Add`);
+
+                $("#editButton").on("click", (event) => {
+                    event.preventDefault();
+                    AddContact(fullName.value, contactNumber.value, emailAddress.value);
+                    location.href = "/contact-list";
+                });
+
+                $("#cancelButton").on("click", () =>{
+                    location.href = "/contact-list";
+                });
+
+                break;
+            default:{
+                // edit case
+                //get contact information from localStorage
+                let contact = new Contact();
+                contact.deserialize(localStorage.getItem(page));
+
+                //display the contact info in the edit form
+                $("#fullName").val(contact.FullName);
+                $("#contactNumber").val(contact.ContactNumber);
+                $("#emailAddress").val(contact.EmailAddress);
+
+                //When editButton is pressed - update the contact
+                $("#editButton").on("click", (event) => {
+                    event.preventDefault();
+                    //get any changes from the form
+                    contact.FullName = $("#fullName").val();
+                    contact.ContactNumber = $("#contactNumber").val();
+                    contact.EmailAddress = $("#emailAddress").val();
+
+                    // replace the item in localStorage
+                    localStorage.setItem(page, contact.serialize());
+
+                    // return to the contact-list
+                    location.href = "/contact-list";
+                });
+            }
+                break;
+        }
+
+    }
+
     function DisplayLoginPage(){
-        console.log("Login Page");
-        let username = $("#username");
-        let password = $("#password");
-        $("#loginButton").on("click", function(){
-            event.preventDefault();
-            if (username.val() !== "" && password.val() !== ""){
-                sessionStorage.setItem("log", username.val());
-                location.href = "index.html";
-            }
-        });
-    }
-    // Displays register page TODO: Revisit this, try to get it working.
-    function DisplayRegisterPage(){
-        $("#registerBtn").on("click",function(){
-            event.preventDefault();
-            $("#firstName").append(`<div id="ErrorMessage"></div>`);
-            let errorMessage = $("#ErrorMessage");
-            let FirstName = $("#firstName").val().trim();
-            let LastName = $("#lastName").val().trim();
-            let UserEmailAddress = $("#emailAddress").val().trim();
-            let UserPass = $("#password").val().trim();
-            let confirmUserPass = $("#confirmPassword").val().trim();
+        console.log("Loading Login Page");
 
-            if (FirstName.length < 2){
-                errorMessage.text("First name has to be longer than 2 characters").show();
-            }
-            if (LastName.length < 2){
-                errorMessage.text("Last name has to be longer than 2 characters").show();
-            }
-            if (UserEmailAddress.length < 8 || !UserEmailAddress.includes('@')){
-                errorMessage.text("Email should be longer than 8 characters and/or include @").show();
-            }
-            if (UserPass.length < 6){
-                errorMessage.text("Password should be longer than 6 characters").show();
-            }
-            if (UserPass != confirmUserPass){
-                errorMessage.text("Passwords are not the same").show();
-            }
-            else {
-                // Validation Passes TODO: Code this
-            }
+
+        let messageArea = $("#messageArea");
+        messageArea.hide();
+
+        $("#loginButton").on("click", function (){
+
+            let success = false;
+            let newUser = new core.User();
+
+            $.get("./data/user.json", function(data){
+
+                for(const user of data.user){
+                    if(username.value === user.Username && password.value === user.Password){
+                        success = true;
+                        newUser.fromJSON(user);
+                        break;
+                    }
+                }
+
+                if(success){
+                    sessionStorage.setItem("user", newUser.serialize());
+                    messageArea.removeAttr("class").hide();
+                    location.href = "home.html";
+                }
+                else{
+                    // Failed the authentication
+                    $("#username").trigger("focus").trigger("select");
+                    messageArea.addClass("alert alert-danger").text("Error: Invalid credentials");
+                }
+            });
+
+            $("#cancelButton").on("click", function() {
+                document.forms[0].reset();
+                location.href = "home.html";
+            })
+
+
         });
     }
+
     function CheckLogin(){
-
-        if(sessionStorage.getItem("log")){
-            console.log("test");
+        if(sessionStorage.getItem("user")){
             $("#login").html(`<a id="logout" class="nav-link" href="#">
-                                                    <i class="fas fa-sign-out-alt"></i>Logout</a>`);
-            let LoginUsername = document.createElement("li");
-            LoginUsername.textContent = sessionStorage.getItem("log");
-            LoginUsername.setAttribute("class", "nav-item");
-            LoginUsername.setAttribute("style","color:gray");
-            UnorderedList.appendChild(LoginUsername);
-
-            //puts username between Contact Us + Login/Logout button
-            UnorderedList.insertBefore(LoginUsername, UnorderedList.children[5]);
+            <i class="fas fa-sign-out-alt"></i> Logout</a>`);
         }
         $("#logout").on("click", function(){
             sessionStorage.clear();
-            location.href = "./login.html"
-        });
-    }
-    function DisplayHomePage() {
-
-        const Para3Text = "This website is a part of our WEBD6201 course at Durham College. On this website, you" +
-            " will find tabs dedicated to personal projects, services provided, as well as more about the authors of this website.";
-
-        // Get the element where the text needs to be inserted
-        const Para3 = document.getElementById("Paragraph3");
-        // Set the text to the element
-        Para3.innerHTML = Para3Text;
-        let AboutUsButton = document.getElementById("AboutUsBtn");
-        AboutUsButton.addEventListener("click", function () {
-            location.href = "about.html"
+            location.href = "/login";
         });
     }
 
-    function DisplayProjectsPage() {
-        // Store the text to be inserted in variables
-        const title1text = '"WEBD6201 Assignment 1" Andrew Graham & Sebastian Castelan';
+    function DisplayRegisterPage(){
+        console.log("Loading Registry Page")
+    }
 
-        // Get the element where the text needs to be inserted
-        const title1 = document.getElementById("Title1");
+    function Display404Page(){
+        console.log("404 Page");
+    }
 
-        // Set the text to the element
-        title1.innerHTML = title1text;
-        // Store the text to be inserted in variables
-        const title2text = '"Drufolio" Andrew Graham';
+    function ActiveLinkCallback(){
+        switch(router.ActiveLink){
+            case "home" : return DisplayHomePage;
+            case "about" : return DisplayAboutUsPage;
+            case "services" : return DisplayServicesPage;
+            case "contact" : return DisplayContactPage;
+            case "contact-list" : return DisplayContactListPage;
+            case "products" : return DisplayProductPage;
+            case "register" : return DisplayRegisterPage;
+            case "login" : return DisplayLoginPage;
+            case "edit" : return DisplayEditPage;
+            case "404" : return Display404Page;
+            default:
+                console.error("Error: callback does not exist" + router.ActiveLink);
+                break;
+        }
+    }
 
-        // Get the element where the text needs to be inserted
-        const title2 = document.getElementById("Title2");
+    function CapitalizeFirstLetter(str){
+        return str.charAt(0).toUpperCase() + str.splice(1);
+    }
 
-        // Set the text to the element
-        title2.innerHTML = title2text;
-        const title3text = '"Drucumentation" Andrew Graham';
 
-        // Get the element where the text needs to be inserted
-        const title3 = document.getElementById("Title3");
+    function LoadHeader(){
 
-        // Set the text to the element
-        title3.innerHTML = title3text;
+        $.get("/views/components/header.html", function (html_data) {
 
-        // Store the text to be inserted in variables
-        const Para1text = "In our time at Durham College, we have picked up various skills that can be considered very useful in a professional\n" +
-            "        environment. Some of those skills include custom programming, web design, and being able to follow specified instructions\n" +
-            "       exactly as described by an instructor, or in this case, a client.";
+            $("header").html(html_data);
 
-        // Get the element where the text needs to be inserted
-        const Para1 = document.getElementById("Paragraph1");
-
-        // Set the text to the element
-        Para1.innerHTML = Para1text;
-
-        // Store the text to be inserted in variables
-        const Para2text = "This project is my stepping stone into Web Development, as well as getting familiar with GitHub in a personal\n" +
-            "    project environment, as opposed to a professional industry environment in which the repository was already set up.";
-
-        // Get the element where the text needs to be inserted
-        const Para2 = document.getElementById("Paragraph2");
-
-        // Set the text to the element
-        Para2.innerHTML = Para2text;
-        const Para3Text = "This project works hand-in-hand with Drucumentation as a stepping stone into Web Development. This website"+
-            " is essentially where I share my thoughts, opinions, as well as history/lore about some of my hobbies and past times," +
-            " such as video games, and fragrances.";
-
-        // Get the element where the text needs to be inserted
-        const Para3 = document.getElementById("Paragraph3");
-        // Set the text to the element
-        Para3.innerHTML = Para3Text;
-        let ProductsButton = document.getElementById("ProductsBtn");
-        ProductsButton.addEventListener("click", function () {
-            location.href = "projects.html"
+            document.title = CapitalizeFirstLetter(router.ActiveLink);
+            $(`li > a:contains(${document.title})`).addClass("active");
+            CheckLogin();
         });
     }
 
-    function DisplayServicesPage() {
+    function LoadContent(ActiveLink, callback){
 
-        // Store the text to be inserted in variables
-        const Para1text = "This is the website that you're looking at right now. This will be the stepping stone into greatness,\n" +
-            "    and this is a project that I believe will give us what we need to succeed in Web Development in the future.";
+        let page_name = router.ActiveLink;
+        let Callback = ActiveLinkCallback();
 
-        // Get the element where the text needs to be inserted
-        const Para1t = document.getElementById("Paragraph1");
+        $.get(`/views/content/${page_name}.html`, function (html_data) {
 
-        // Set the text to the element
-        Para1t.innerHTML = Para1text;
-
-        // Store the text to be inserted in variables
-        const Para2text = "With web development being such a finicky thing, it's no doubt that everybody has a different vision in mind for their projects." +
-            " With that being said, in our time at Durham College, we've mastered the art of custom programming, and are able to fulfill anything that"+
-            " may be requested.";
-
-        // Get the element where the text needs to be inserted
-        const Para2t = document.getElementById("Paragraph2");
-
-        // Set the text to the element
-        Para2t.innerHTML = Para2text;
-        const Para3Text = "The Web Development courses offered at Durham College have given the graduates and current students alike the ability to"+
-            " design websites in their own free time. Sebastian and I are no different. That said, this is my personal project, 'Drufolio'. It is"+
-            " essentially a blog-style portfolio that links to my other website 'Drucumentation', as well as shows all my social medias, and an introductory blurb.";
-
-        // Get the element where the text needs to be inserted
-        const Para3 = document.getElementById("Paragraph3");
-        // Set the text to the element
-        Para3.innerHTML = Para3Text;
-        const Para4Text = "As students, we're no strangers to having to fulfill requirements and instructions assigned by professors. In the"+
-            " real world, this is no different. As an employee, you are expected to fulfill your various duties. As students, we've mastered" +
-            " this, and we can follow instructions EXACTLY as they're said, and we do not allow room for error.";
-
-        // Get the element where the text needs to be inserted
-        const Para4 = document.getElementById("Paragraph4");
-        // Set the text to the element
-        Para4.innerHTML = Para4Text;
-        let ServicesButton = document.getElementById("ServicesBtn");
-        ServicesButton.addEventListener("click", function () {
-            location.href = "services.html"
-        })
-    }
-
-    function DisplayAboutUsPage() {
-// Store the text to be inserted in variables
-        const Para1text = "Hello. My name is Andrew, and I am a 2nd year Computer Programming & Analysis student currently enrolled at Durham College."+
-            " I've always had a profound interest in anything tech related, and I've been wanting to pursue a career in Software Development since 15.";
-
-        // Get the element where the text needs to be inserted
-        const Para1te = document.getElementById("Paragraph1");
-
-        // Set the text to the element
-        Para1te.innerHTML = Para1text;
-
-        // Store the text to be inserted in variables
-        const Para2text = "Hello. My name is Sebastian, and I am a 2nd year Computer Programming & Analysis student currently enrolled at Durham College."+
-            "Technology has always fascinated me, ever since my youth. In my earlier teenage years, I always dreamed of becoming a Software Developer "+
-            "but in later years I've discovered my true passion lies in Cyber Security and Data Networking. When my time at Durham College is over, "+
-            "I hope to continue my education in university majoring in CyberSecurity.";
-
-        // Get the element where the text needs to be inserted
-        const Para2t = document.getElementById("Paragraph2");
-
-        // Set the text to the element
-        Para2t.innerHTML = Para2text;
-        const Para3Text = "The Web Development courses offered at Durham College have given the graduates and current students alike the ability to"+
-            " design websites in their own free time. Sebastian and I are no different. That said, this is my personal project, 'Drufolio'. It is"+
-            " essentially a blog-style portfolio that links to my other website 'Drucumentation', as well as shows all my social medias, and an introductory blurb.";
-
-    }
-
-    function DisplayContactPage() {
-        let ContactUsButton = document.getElementById("ContactUsBtn");
-        ContactUsButton.addEventListener("click", function () {
-            location.href = "contact.html"
+            $("main").html(html_data);
+            Callback();
         });
+
+
     }
 
+    function LoadFooter(){
+        $.get("/views/components/footer.html", function (html_data) {
+            $("footer").html(html_data);
+        });
 
+    }
+
+    // Start function to call the methods listed above in a switch case on start up
+    function Start(){
+        console.log("App Started!")
+
+        LoadHeader();
+
+        LoadContent();
+
+        LoadFooter();
+
+    }
     window.addEventListener("load", Start)
-    const navbar = document.querySelector('#navbar');
-    const copyright = document.querySelector('#copyright');
-
-    navbar.style.position = 'fixed';
-    navbar.style.bottom = '0';
-    navbar.style.width = '100%';
-    navbar.style.backgroundColor = 'lightgray';
-    navbar.style.display = 'flex';
-    navbar.style.justifyContent = 'space-around';
-
-    const links = navbar.querySelectorAll('a');
-
-    links.forEach((link) => {
-        link.style.display = 'inline-block';
-        link.style.padding = '10px';
-        link.style.color = 'black';
-    });
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-
-    document.getElementById("copyright").innerHTML = `Copyright &copy; ${year} All rights reserved.`;
-    const form = document.querySelector('#contact-form');
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const name = form.querySelector('#name').value;
-        const number = form.querySelector('#number').value;
-        const email = form.querySelector('#email').value;
-        const message = form.querySelector('#message').value;
-
-        console.log({name, number, email, message});
-
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 3000);
-    });
-
-
-    let MainContent = document.getElementsByTagName("main");
-    let MainParagraph = document.createElement("p");
-
-    MainParagraph.setAttribute("id", "MainParagraph");
-    MainParagraph.setAttribute("class", "mt-3");
-    MainParagraph.textContent = "This is the Main Paragraph"
-
-    MainContent.appendChild(MainParagraph)
-
-    let FirstString = "This is";
-    let SecondString = `${FirstString} the Main Paragraph`;
-    MainParagraph.textContent = SecondString;
-
-    let Article = document.createElement("article");
-    let ArticleParagraph = `<p id="ArticleParagraph" class='"mt-3">This is my article paragraph</p>`;
-    Article.setAttribute("class", "container")
-    Article.innerHTML = ArticleParagraph;
-    DocumentBody.appendChild(article);
 
 })();
